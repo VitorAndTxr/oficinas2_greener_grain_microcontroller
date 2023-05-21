@@ -11,8 +11,8 @@
   copies or substantial portions of the Software.
 *********/
 
-const int trigPin = 5;
-const int echoPin = 18;
+const int trigPin = 25;
+const int echoPin = 35;
 
 //define sound speed in cm/uS
 #define SOUND_SPEED 0.034

@@ -1,82 +1,114 @@
+#include <Arduino.h>
 
-/*
+/*********
   Rui Santos
-  Complete project details at Complete project details at https://RandomNerdTutorials.com/esp32-http-get-post-arduino/
-
+  Complete project details at https://RandomNerdTutorials.com/esp32-hc-sr04-ultrasonic-arduino/
+  
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files.
-
+  
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-*/
-#include <Arduino.h>
-#include <WiFi.h>
-#include <HTTPClient.h>
+*********/
 
-const char* ssid = "OnPoint 2.4G";
-const char* password = "eunaosei";
+const int trigPinUS1 = 32;
+const int echoPinUS1 = 39;
 
-//Your Domain name with URL path or IP address with path
-String serverName = "http://192.168.18.6:6006/api/v1/Health";
+const int trigPinUS2 = 33;
+const int echoPinUS2 = 34;
 
-// the following variables are unsigned longs because the time, measured in
-// milliseconds, will quickly become a bigger number than can be stored in an int.
-unsigned long lastTime = 0;
-// Timer set to 10 minutes (600000)
-//unsigned long timerDelay = 600000;
-// Set timer to 5 seconds (5000)
-unsigned long timerDelay = 5000;
+const int trigPinUS3 = 25;
+const int echoPinUS3 = 35;
+
+const int loadCellSck = 15;
+const int loadCellDT =  2;
+
+const int stepMotor1 = 12;
+const int dirMotor1 = 14;
+
+const int stepMotor2 = 27;
+const int dirMotor2 = 26;
+
+
+//define sound speed in cm/uS
+#define SOUND_SPEED 0.034
+#define CM_TO_INCH 0.393701
+
+long duration;
+float distanceCm;
+float distanceInch;
+void initiateUltrassonicSensor(void);
+void measureDistanceUS(void);
 
 void setup() {
-  Serial.begin(921600); 
-
-  WiFi.begin(ssid, password);
-  Serial.println("Connecting");
-  while(WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
- 
-  Serial.println("Timer set to 5 seconds (timerDelay variable), it will take 5 seconds before publishing the first reading.");
+  Serial.begin(921600);
+  initiateUltrassonicSensor();
 }
 
 void loop() {
-  //Send an HTTP POST request every 10 minutes
-  if ((millis() - lastTime) > timerDelay) {
-    //Check WiFi connection status
-    if(WiFi.status()== WL_CONNECTED){
-      HTTPClient http;
-
-      String serverPath = serverName + "?temperature=24.37";
-      
-      // Your Domain name with URL path or IP address with path
-      http.begin(serverPath.c_str());
-      
-      // If you need Node-RED/server authentication, insert user and password below
-      //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
-      
-      // Send HTTP GET request
-      int httpResponseCode = http.GET();
-      
-      if (httpResponseCode>0) {
-        Serial.print("HTTP Response code: ");
-        Serial.println(httpResponseCode);
-        String payload = http.getString();
-        Serial.println(payload);
-      }
-      else {
-        Serial.print("Error code: ");
-        Serial.println(httpResponseCode);
-      }
-      // Free resources
-      http.end();
-    }
-    else {
-      Serial.println("WiFi Disconnected");
-    }
-    lastTime = millis();
-  }
+  measureDistanceUS();
+  delay(1000);
 }
+
+void initiateUltrassonicSensor(){
+    pinMode(trigPinUS1, OUTPUT); // Sets the trigPin as an Output
+    pinMode(echoPinUS1, INPUT); // Sets the echoPin as an Input
+    pinMode(trigPinUS2, OUTPUT); // Sets the trigPin as an Output
+    pinMode(echoPinUS2, INPUT); // Sets the echoPin as an Input
+    pinMode(trigPinUS3, OUTPUT); // Sets the trigPin as an Output
+    pinMode(echoPinUS3, INPUT); // Sets the echoPin as an Input
+}
+
+void measureDistanceUS(){
+  digitalWrite(trigPinUS1, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinUS1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinUS1, LOW);
+  
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPinUS1, HIGH);
+  
+  // Calculate the distance
+  distanceCm = duration * SOUND_SPEED/2;
+  
+  // Prints the distance in the Serial Monitor
+  Serial.print("Distance (cm) US 1: ");
+  Serial.println(distanceCm);
+
+  digitalWrite(trigPinUS2, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinUS2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinUS2, LOW);
+  
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPinUS2, HIGH);
+  
+  // Calculate the distance
+  distanceCm = duration * SOUND_SPEED/2;
+  
+  // Prints the distance in the Serial Monitor
+  Serial.print("Distance (cm) US 2: ");
+  Serial.println(distanceCm);
+
+  digitalWrite(trigPinUS3, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinUS3, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinUS3, LOW);
+  
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPinUS3, HIGH);
+  
+  // Calculate the distance
+  distanceCm = duration * SOUND_SPEED/2;
+  
+  // Prints the distance in the Serial Monitor
+  Serial.print("Distance (cm) US 3: ");
+  Serial.println(distanceCm);
+}
+
