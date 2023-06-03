@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
 const char* ssid = "Vitor2.4G";
-const char* password =  "eunaosei";
+const char* password = "eunaosei";
 
 void initiateWifi(){
   WiFi.begin(ssid, password);
