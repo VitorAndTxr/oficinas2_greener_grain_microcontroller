@@ -1,13 +1,25 @@
 #include <HX711_ADC.h>
 #if defined(ESP8266)|| defined(ESP32) || defined(AVR)
 #include <EEPROM.h>
-#include <GPIO/GPIOInit.h>
+#include <Arduino.h>
+
 #endif
+
+const int stepMotor1 = 12;
+const int dirMotor1 = 14;
+
+const int stepMotor2 = 27;
+const int dirMotor2 = 26;
 
 //Definicao motor
 
 const int delayPassosLento = 3000;
 const int delayPassosRapidos = 2000;
+
+struct Motor{
+  int Step;
+  int Dir;
+};
 
 const Motor UnitMotors[2] = {{
   stepMotor1,
@@ -28,6 +40,11 @@ void setupMotor()
 
 void gira(int sentido, int passos, int delayPassos, Motor motor)
 {
+    Serial.println("motor dir:");
+    Serial.println(motor.Dir);
+    Serial.println(motor.Step);
+
+
     if (sentido == 0){ 
       digitalWrite(motor.Dir, HIGH);
       Serial.println("Spinning Clockwise...");
@@ -41,7 +58,7 @@ void gira(int sentido, int passos, int delayPassos, Motor motor)
       }
     }
     else if (sentido == 1){
-      digitalWrite(DIR, LOW);
+      digitalWrite(motor.Dir, LOW);
       Serial.println("Spinning Anti-Clockwise...");
 
       for(int i = 0; i<passos; i++)
@@ -55,7 +72,3 @@ void gira(int sentido, int passos, int delayPassos, Motor motor)
 
 }
 
-struct Motor{
-  int Step;
-  int Dir;
-};

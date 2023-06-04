@@ -1,5 +1,15 @@
 #include <Arduino.h>
-#include "GPIO/GPIOInit.h"
+
+
+const int trigPinUS1 = 32;
+const int echoPinUS1 = 39;
+
+const int trigPinUS2 = 33;
+const int echoPinUS2 = 34;
+
+const int trigPinUS3 = 25;
+const int echoPinUS3 = 35;
+
 
 //define sound speed in cm/uS
 
@@ -12,64 +22,50 @@ float distanceInch;
 void initiateUltrassonicSensor(void);
 void measureDistanceUS(void);
 
+struct Sensor{
+  int trig;
+  int echo;
+};
+
+const Sensor UnitSensors[3] = {
+  {
+    trigPinUS1,
+    echoPinUS1
+  },
+  {
+    trigPinUS2,
+    echoPinUS2
+  },
+  {
+    trigPinUS3,
+    echoPinUS3
+  }
+  };
+
 void initiateUltrassonicSensor(){
-    pinMode(trigPinUS1, OUTPUT); // Sets the trigPin as an Output
-    pinMode(echoPinUS1, INPUT); // Sets the echoPin as an Input
-    pinMode(trigPinUS2, OUTPUT); // Sets the trigPin as an Output
-    pinMode(echoPinUS2, INPUT); // Sets the echoPin as an Input
-    pinMode(trigPinUS3, OUTPUT); // Sets the trigPin as an Output
-    pinMode(echoPinUS3, INPUT); // Sets the echoPin as an Input
+    pinMode(UnitSensors[0].trig, OUTPUT); // Sets the trigPin as an Output
+    pinMode(UnitSensors[0].echo, INPUT); // Sets the echoPin as an Input
+    pinMode(UnitSensors[1].trig, OUTPUT); // Sets the trigPin as an Output
+    pinMode(UnitSensors[1].echo, INPUT); // Sets the echoPin as an Input
+    pinMode(UnitSensors[2].trig, OUTPUT); // Sets the trigPin as an Output
+    pinMode(UnitSensors[2].echo, INPUT); // Sets the echoPin as an Input
 }
 
-void measureDistanceUS(){
-  digitalWrite(trigPinUS1, LOW);
+void measureDistanceUS(Sensor sensor){
+  digitalWrite(sensor.trig, LOW);
   delayMicroseconds(2);
   // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPinUS1, HIGH);
+  digitalWrite(sensor.trig, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPinUS1, LOW);
+  digitalWrite(sensor.trig, LOW);
   
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPinUS1, HIGH);
+  duration = pulseIn(sensor.echo, HIGH);
   
   // Calculate the distance
   distanceCm = duration * SOUND_SPEED/2;
   
   // Prints the distance in the Serial Monitor
-  Serial.print("Distance (cm) US 1: ");
-  Serial.println(distanceCm);
-
-  digitalWrite(trigPinUS2, LOW);
-  delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPinUS2, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPinUS2, LOW);
-  
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPinUS2, HIGH);
-  
-  // Calculate the distance
-  distanceCm = duration * SOUND_SPEED/2;
-  
-  // Prints the distance in the Serial Monitor
-  Serial.print("Distance (cm) US 2: ");
-  Serial.println(distanceCm);
-
-  digitalWrite(trigPinUS3, LOW);
-  delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPinUS3, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPinUS3, LOW);
-  
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPinUS3, HIGH);
-  
-  // Calculate the distance
-  distanceCm = duration * SOUND_SPEED/2;
-  
-  // Prints the distance in the Serial Monitor
-  Serial.print("Distance (cm) US 3: ");
+  Serial.print("Distance (cm): ");
   Serial.println(distanceCm);
 }
