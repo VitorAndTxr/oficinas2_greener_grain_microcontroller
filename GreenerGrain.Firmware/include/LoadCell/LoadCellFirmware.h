@@ -53,27 +53,27 @@ void setupLoadCell() {
   }
   else {
     float newCalibrationValue = EEPROM.readFloat(calVal_eepromAdress);
-    Serial.println("newCalibrationValue:");
-    Serial.println(newCalibrationValue);
+    // Serial.println("newCalibrationValue:");
+    // Serial.println(newCalibrationValue);
+    Serial.print("Calibracao:");
 
     
     if(!isinf(newCalibrationValue)&&newCalibrationValue!=0){
-      Serial.println("Salvo no eprom");
+      Serial.println(newCalibrationValue);
       LoadCell.setCalFactor(newCalibrationValue); // user set calibration value (float), initial value 1.0 may be used for this sketch
     }else{
-      Serial.println("padrão");
+      Serial.println(-22.60);
 
-      LoadCell.setCalFactor(-22.50); // user set calibration value (float), initial value 1.0 may be used for this sketch
+      LoadCell.setCalFactor(-22.60); // user set calibration value (float), initial value 1.0 may be used for this sketch
 
     }
     Serial.println("Startup is complete");
   }
   while (!LoadCell.update());
-
-  getValue();
 }
 
-void getValue() {
+float getCurrentWeight() {
+  float peso;
   static boolean newDataReady = 0;
   const int serialPrintInterval = 0; //increase value to slow down serial print activity
 
@@ -83,25 +83,15 @@ void getValue() {
   // get smoothed value from the dataset:
   if (newDataReady) {
     if (millis() > t + serialPrintInterval) {
-      float i = LoadCell.getData();
-      Serial.print("Load_cell output val: ");
-      Serial.println(i);
+      peso = LoadCell.getData();
+      // Serial.print("Load_cell output val: ");
+      // Serial.println(peso);
       newDataReady = 0;
       t = millis();
     }
   }
 
-  // receive command from serial terminal
-  if (Serial.available() > 0) {
-    char inByte = Serial.read();
-    if (inByte == 't') LoadCell.tareNoDelay(); //tare
-   }
-
-  // check if last tare operation is complete
-  if (LoadCell.getTareStatus() == true) {
-    Serial.println("Tare complete");
-  }
-
+  return peso;
 }
 
 void calibrateLoadCell() {

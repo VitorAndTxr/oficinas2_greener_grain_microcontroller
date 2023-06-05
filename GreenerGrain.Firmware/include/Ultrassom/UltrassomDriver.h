@@ -16,9 +16,6 @@ const int echoPinUS3 = 35;
 #define SOUND_SPEED 0.034
 #define CM_TO_INCH 0.393701
 
-long duration;
-float distanceCm;
-float distanceInch;
 void initiateUltrassonicSensor(void);
 void measureDistanceUS(void);
 
@@ -51,7 +48,9 @@ void initiateUltrassonicSensor(){
     pinMode(UnitSensors[2].echo, INPUT); // Sets the echoPin as an Input
 }
 
-void measureDistanceUS(Sensor sensor){
+float measureDistanceUS(Sensor sensor){
+  
+
   digitalWrite(sensor.trig, LOW);
   delayMicroseconds(2);
   // Sets the trigPin on HIGH state for 10 micro seconds
@@ -60,12 +59,14 @@ void measureDistanceUS(Sensor sensor){
   digitalWrite(sensor.trig, LOW);
   
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(sensor.echo, HIGH);
+  long duration = pulseIn(sensor.echo, HIGH);
   
   // Calculate the distance
-  distanceCm = duration * SOUND_SPEED/2;
+  float distanceCm = duration * SOUND_SPEED/2;
   
   // Prints the distance in the Serial Monitor
-  Serial.print("Distance (cm): ");
-  Serial.println(distanceCm);
+  // Serial.print("Distance (cm): ");
+  // Serial.println(distanceCm);
+
+  return distanceCm;
 }

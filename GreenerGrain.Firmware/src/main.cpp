@@ -1,8 +1,9 @@
+#include "Ultrassom/UltrassomDriver.h"
+#include "LoadCell/LoadCellFirmware.h"
+#include "Motor/MotorFirmware.h"
 #include "WifiServer/WifiConfig.h"
 #include "HttpServer/Server.h"
 #include "HttpClient/HttpClientConfig.h"
-#include "Ultrassom/UltrassomDriver.h"
-#include "LoadCell/LoadCellFirmware.h"
 
 
 void inicializationMode(void);
@@ -22,9 +23,11 @@ void setup() {
 void loop() {
   //getAPIHealth();
 
-  // measureDistanceUS(UnitSensors[0]);
-  // measureDistanceUS(UnitSensors[1]);
-  // measureDistanceUS(UnitSensors[2]);
+  // Serial.println("Init");
+
+  // Serial.println(measureDistanceUS(UnitSensors[0]));
+  // Serial.println(measureDistanceUS(UnitSensors[1]));
+  // Serial.println(measureDistanceUS(UnitSensors[2]));
 
   
   // gira(1, 100, delayPassosLento, UnitMotors[0]);
@@ -34,9 +37,8 @@ void loop() {
   // gira(1, 100, delayPassosLento, UnitMotors[1]);
   // delay(1000);
   // gira(0, 100, delayPassosLento, UnitMotors[1]);
-  // delay(1000);
 
-  //getValue();
+  //Serial.println(getCurrentWeight());
 }
 
 void inicializationMode(){
