@@ -4,6 +4,7 @@
 #include "WifiServer/WifiConfig.h"
 #include "HttpServer/Server.h"
 #include "HttpClient/HttpClientConfig.h"
+#include "esp_task_wdt.h"
 
 
 void inicializationMode(void);
@@ -12,6 +13,8 @@ void setup() {
 
 
   Serial.begin(115200);
+  esp_task_wdt_deinit();
+
   initiateWifi();
   initiateServer();
   setupMotor();
@@ -20,7 +23,41 @@ void setup() {
   inicializationMode();
 }
 
+void testMotor(){
+
+
+    //StaticJsonDocument<200> doc = deserializeJson(data);
+
+    //int peso = doc["peso"];
+    //int module = doc["module"];
+    
+    float balanceDistance = measureDistanceUS(UnitSensors[2]);
+    float curretPeso = getCurrentWeight();
+
+    Serial.println("Esperando recipiente");
+
+    do{
+          balanceDistance = measureDistanceUS(UnitSensors[2]);
+          curretPeso = getCurrentWeight();
+          delay(100);
+
+
+
+    }while(((balanceDistance > 25) || (curretPeso<15)));
+
+    Serial.println("Aguardando tara...");
+
+    delay(5000);
+
+
+    gira(ANTIHORARIO, 400, delayPassosRapidos,UnitMotors[currentModule]);
+    currentModule = -1;
+}
+
 void loop() {
+
+  if(currentModule>-1)
+    testMotor();
   //getAPIHealth();
 
   // Serial.println("Init");
