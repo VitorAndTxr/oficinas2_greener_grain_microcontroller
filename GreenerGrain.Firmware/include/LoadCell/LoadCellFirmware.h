@@ -22,30 +22,25 @@
 #if defined(ESP8266)|| defined(ESP32) || defined(AVR)
 #include <EEPROM.h>
 #endif
+#include <math.h>
 
 //pins:
-const int HX711_dout = 16; //mcu > HX711 dout pin
-const int HX711_sck = 4; //mcu > HX711 sck pin
-
+const int HX711_dout = 2; //mcu > HXt711 dout pin
+const int HX711_sck = 15; //mcu > HX711 sck pin
+void getValue(void);
 //HX711 constructor:
 HX711_ADC LoadCell(HX711_dout, HX711_sck);
 
 const int calVal_eepromAdress = 0;
 unsigned long t = 0;
 
-
-
-void gira(int sentido, int passos);
-void setupMotor(void);
-void calibrate(void);
-
-void setup() {
-  Serial.begin(57600); 
-  delay(10);
+void setupLoadCell() {
   Serial.println();
-  Serial.println("Starting...");
+  Serial.println("Starting LoadCell...");
 
-  setupMotor();
+  #if defined(ESP8266)|| defined(ESP32)
+        EEPROM.begin(512);
+  #endif  
 
   LoadCell.begin();
   //LoadCell.setReverseOutput(); //uncomment to turn a negative output value to positive
@@ -57,14 +52,28 @@ void setup() {
     while (1);
   }
   else {
-    LoadCell.setCalFactor(1.0); // user set calibration value (float), initial value 1.0 may be used for this sketch
+    float newCalibrationValue = EEPROM.readFloat(calVal_eepromAdress);
+    Serial.println("newCalibrationValue:");
+    Serial.println(newCalibrationValue);
+
+    
+    if(!isinf(newCalibrationValue)&&newCalibrationValue!=0){
+      Serial.println("Salvo no eprom");
+      LoadCell.setCalFactor(newCalibrationValue); // user set calibration value (float), initial value 1.0 may be used for this sketch
+    }else{
+      Serial.println("padrão");
+
+      LoadCell.setCalFactor(-22.50); // user set calibration value (float), initial value 1.0 may be used for this sketch
+
+    }
     Serial.println("Startup is complete");
   }
   while (!LoadCell.update());
-  calibrate(); //start calibration procedure
+
+  getValue();
 }
 
-void loop() {
+void getValue() {
   static boolean newDataReady = 0;
   const int serialPrintInterval = 0; //increase value to slow down serial print activity
 
@@ -73,16 +82,20 @@ void loop() {
 
   // get smoothed value from the dataset:
   if (newDataReady) {
-    
+    if (millis() > t + serialPrintInterval) {
+      float i = LoadCell.getData();
+      Serial.print("Load_cell output val: ");
+      Serial.println(i);
+      newDataReady = 0;
+      t = millis();
+    }
   }
 
   // receive command from serial terminal
   if (Serial.available() > 0) {
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay(); //tare
-    else if (inByte == 'r') calibrate(); //calibrate
-    else if (inByte == 'c') changeSavedCalFactor(); //edit calibration value manually
-  }
+   }
 
   // check if last tare operation is complete
   if (LoadCell.getTareStatus() == true) {
@@ -91,7 +104,7 @@ void loop() {
 
 }
 
-void calibrate() {
+void calibrateLoadCell() {
   Serial.println("***");
   Serial.println("Start calibration:");
   Serial.println("Place the load cell an a level stable surface.");
@@ -129,9 +142,12 @@ void calibrate() {
       }
     }
   }
-
+  Serial.println(known_mass);
   LoadCell.refreshDataSet(); //refresh the dataset to be sure that the known mass is measured correct
+  Serial.println(known_mass);
   float newCalibrationValue = LoadCell.getNewCalibration(known_mass); //get the new calibration value
+  Serial.println(newCalibrationValue);
+
 
   Serial.print("New calibration value has been set to: ");
   Serial.print(newCalibrationValue);
@@ -148,11 +164,11 @@ void calibrate() {
 #if defined(ESP8266)|| defined(ESP32)
         EEPROM.begin(512);
 #endif
-        EEPROM.put(calVal_eepromAdress, newCalibrationValue);
+        EEPROM.writeFloat(calVal_eepromAdress, newCalibrationValue);
 #if defined(ESP8266)|| defined(ESP32)
         EEPROM.commit();
 #endif
-        EEPROM.get(calVal_eepromAdress, newCalibrationValue);
+        newCalibrationValue = EEPROM.readFloat(calVal_eepromAdress);
         Serial.print("Value ");
         Serial.print(newCalibrationValue);
         Serial.print(" saved to EEPROM address: ");
@@ -182,6 +198,8 @@ void changeSavedCalFactor() {
   Serial.println(oldCalibrationValue);
   Serial.println("Now, send the new value from serial monitor, i.e. 696.0");
   float newCalibrationValue;
+  float calibrationValueAfter;
+
   while (_resume == false) {
     if (Serial.available() > 0) {
       newCalibrationValue = Serial.parseFloat();
@@ -204,11 +222,11 @@ void changeSavedCalFactor() {
 #if defined(ESP8266)|| defined(ESP32)
         EEPROM.begin(512);
 #endif
-        EEPROM.put(calVal_eepromAdress, newCalibrationValue);
+        EEPROM.writeFloat(calVal_eepromAdress, newCalibrationValue);
 #if defined(ESP8266)|| defined(ESP32)
         EEPROM.commit();
 #endif
-        EEPROM.get(calVal_eepromAdress, newCalibrationValue);
+        calibrationValueAfter = EEPROM.readFloat(calVal_eepromAdress);
         Serial.print("Value ");
         Serial.print(newCalibrationValue);
         Serial.print(" saved to EEPROM address: ");
@@ -224,4 +242,3 @@ void changeSavedCalFactor() {
   Serial.println("End change calibration value");
   Serial.println("***");
 }
-

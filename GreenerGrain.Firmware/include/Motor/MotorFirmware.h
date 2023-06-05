@@ -11,6 +11,8 @@ const int dirMotor1 = 14;
 const int stepMotor2 = 27;
 const int dirMotor2 = 26;
 
+enum SpinDirection {HORARIO, ANTIHORARIO};
+
 //Definicao motor
 
 const int delayPassosLento = 3000;
@@ -38,16 +40,10 @@ void setupMotor()
   pinMode(UnitMotors[1].Dir, OUTPUT);
 }
 
-void gira(int sentido, int passos, int delayPassos, Motor motor)
+void gira(SpinDirection sentido, int passos, int delayPassos, Motor motor)
 {
-    Serial.println("motor dir:");
-    Serial.println(motor.Dir);
-    Serial.println(motor.Step);
-
-
-    if (sentido == 0){ 
+    if (sentido == HORARIO){ 
       digitalWrite(motor.Dir, HIGH);
-      Serial.println("Spinning Clockwise...");
       
       for(int i = 0; i<passos; i++)
       {
@@ -57,9 +53,8 @@ void gira(int sentido, int passos, int delayPassos, Motor motor)
         delayMicroseconds(delayPassos);
       }
     }
-    else if (sentido == 1){
+    else if (sentido == ANTIHORARIO){
       digitalWrite(motor.Dir, LOW);
-      Serial.println("Spinning Anti-Clockwise...");
 
       for(int i = 0; i<passos; i++)
       {

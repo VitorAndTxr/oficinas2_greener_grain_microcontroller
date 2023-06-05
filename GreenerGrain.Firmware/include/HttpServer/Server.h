@@ -1,7 +1,9 @@
 #include <ESPAsyncWebServer.h>
-#include <ArduinoJson.h>
 #include <assert.h>
 #include "JsonToObject/Object.h"
+#include "Motor/MotorFirmware.h"
+
+
 
 
 void handleRequest(AsyncWebServerRequest * request,uint8_t *data);
@@ -10,7 +12,7 @@ AsyncWebServer server(80);
 void initiateServer() { 
 
   server.on(
-    "/post",
+    "/test-module",
     HTTP_POST,
     [](AsyncWebServerRequest * request){},
     NULL,
@@ -34,10 +36,9 @@ void handleRequest(AsyncWebServerRequest * request,uint8_t *data){
     int peso = doc["peso"];
     int module = doc["module"];
     
-    Serial.print("peso:");
-    Serial.println(peso);
-    Serial.print("module:");
-    Serial.println(module);
+    gira(ANTIHORARIO, 400, delayPassosRapidos,UnitMotors[module]);
+
+
 
     request->send(200);
 }
