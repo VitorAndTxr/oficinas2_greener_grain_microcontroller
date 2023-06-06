@@ -2,8 +2,6 @@
 #include <assert.h>
 #include "JsonToObject/Object.h"
 
-int currentModule = -1;
-
 void handleRequest(AsyncWebServerRequest * request,uint8_t *data);
 AsyncWebServer server(80);
  
@@ -26,40 +24,23 @@ void initiateServer() {
 
 void handleRequest(AsyncWebServerRequest * request,uint8_t *data){
 
-    // for (size_t i = 0; i < len; i++) {
-    //   Serial.write(data[i]);
-    // }
+    if(CurrentState == WORKINKG ){
+      request->send(503,"application/json","{\"message\":\"A unidade selecionada nao está disponível\"}");
+      return;
+    }
 
-    // Serial.println();
-
-    request->send(200);
     StaticJsonDocument<200> doc = deserializeJson(data);
 
     int peso = doc["peso"];
     int module = doc["module"];
-
-    currentModule = module;
     
-    // float balanceDistance = measureDistanceUS(UnitSensors[2]);
-    // float curretPeso = getCurrentWeight();
+    Order = {
+      module,
+      peso,
+    };
 
-    // Serial.println("Esperando recipiente");
+    CurrentState = WORKINKG;
 
-    // do{
-    //       balanceDistance = measureDistanceUS(UnitSensors[2]);
-    //       curretPeso = getCurrentWeight();
-    //       delay(400);
-
-
-
-    // }while(((balanceDistance > 25) || (curretPeso<15)));
-
-    // Serial.println("Aguardando tara...");
-
-    // delay(5000);
-
-
-    // gira(ANTIHORARIO, 400, delayPassosRapidos,UnitMotors[module]);
-
+    request->send(200);
 }
 

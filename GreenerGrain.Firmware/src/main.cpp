@@ -1,10 +1,11 @@
 #include "Ultrassom/UltrassomDriver.h"
 #include "LoadCell/LoadCellFirmware.h"
 #include "Motor/MotorFirmware.h"
+#include "ModuleTasks.h"
 #include "WifiServer/WifiConfig.h"
 #include "HttpServer/Server.h"
 #include "HttpClient/HttpClientConfig.h"
-#include "esp_task_wdt.h"
+
 
 
 void inicializationMode(void);
@@ -13,7 +14,6 @@ void setup() {
 
 
   Serial.begin(115200);
-  esp_task_wdt_deinit();
 
   initiateWifi();
   initiateServer();
@@ -21,43 +21,17 @@ void setup() {
   initiateUltrassonicSensor();
   setupLoadCell();
   inicializationMode();
+  CurrentState = IDLE;
 }
 
-void testMotor(){
 
-
-    //StaticJsonDocument<200> doc = deserializeJson(data);
-
-    //int peso = doc["peso"];
-    //int module = doc["module"];
-    
-    float balanceDistance = measureDistanceUS(UnitSensors[2]);
-    float curretPeso = getCurrentWeight();
-
-    Serial.println("Esperando recipiente");
-
-    do{
-          balanceDistance = measureDistanceUS(UnitSensors[2]);
-          curretPeso = getCurrentWeight();
-          delay(100);
-
-
-
-    }while(((balanceDistance > 25) || (curretPeso<15)));
-
-    Serial.println("Aguardando tara...");
-
-    delay(5000);
-
-
-    gira(ANTIHORARIO, 400, delayPassosRapidos,UnitMotors[currentModule]);
-    currentModule = -1;
-}
 
 void loop() {
 
-  if(currentModule>-1)
-    testMotor();
+  if(Order.module>-1)
+  {
+    HandleDispenseOrder();
+  }
   //getAPIHealth();
 
   // Serial.println("Init");
@@ -71,8 +45,10 @@ void loop() {
   // delay(1000);
   // gira(0, 100, delayPassosLento, UnitMotors[0]);
   // delay(1000);
-  // gira(1, 100, delayPassosLento, UnitMotors[1]);
-  // delay(1000);
+  // gira(HORARIO, 100, delayPassosLento, UnitMotors[0]);
+  // gira(HORARIO, 100, delayPassosLento, UnitMotors[1]);
+
+  // delay(500);
   // gira(0, 100, delayPassosLento, UnitMotors[1]);
 
   //Serial.println(getCurrentWeight());

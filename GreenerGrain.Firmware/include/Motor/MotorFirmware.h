@@ -11,11 +11,12 @@ const int dirMotor1 = 14;
 const int stepMotor2 = 27;
 const int dirMotor2 = 26;
 
-enum SpinDirection {HORARIO, ANTIHORARIO};
+enum SpinDirectionEnum {HORARIO, ANTIHORARIO};
+
 
 //Definicao motor
 
-const int delayPassosLento = 3000;
+const int delayPassosLentos = 3000;
 const int delayPassosRapidos = 2000;
 
 struct Motor{
@@ -40,7 +41,7 @@ void setupMotor()
   pinMode(UnitMotors[1].Dir, OUTPUT);
 }
 
-void gira(SpinDirection sentido, int passos, int delayPassos, Motor motor)
+void gira(SpinDirectionEnum sentido, int passos, int delayPassos, Motor motor)
 {
     if (sentido == HORARIO){ 
       digitalWrite(motor.Dir, HIGH);
