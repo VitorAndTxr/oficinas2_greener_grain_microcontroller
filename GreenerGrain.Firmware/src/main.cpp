@@ -9,6 +9,8 @@
 
 
 void inicializationMode(void);
+void testComponents(void);
+void medirPeso(void);
 
 void setup() {
 
@@ -32,26 +34,68 @@ void loop() {
   {
     HandleDispenseOrder();
   }
-  //getAPIHealth();
+  if (Serial.available() > 0) {
 
-  // Serial.println("Init");
+    char inByte = Serial.read();
 
-  // Serial.println(measureDistanceUS(UnitSensors[0]));
-  // Serial.println(measureDistanceUS(UnitSensors[1]));
-  // Serial.println(measureDistanceUS(UnitSensors[2]));
+    if(inByte == 't')
+      testComponents();
 
+    if(inByte == 'p')
+      medirPeso();
+
+  }
+}
+
+void medirPeso(){
+int flag = 1;
+  do{
+
+    Serial.print("Valor balança: ");
+
+    float curretPeso = getCurrentWeight();
+    Serial.print(curretPeso);
+    Serial.println("g");
+
+    delay(200);
+    if (Serial.available() > 0) {
+
+      char inByte = Serial.read();
+
+      if(inByte == 's')
+        flag = 0;
+
+    }
+
+
+
+  }while(flag == 1);
   
-  // gira(1, 100, delayPassosLento, UnitMotors[0]);
-  // delay(1000);
-  // gira(0, 100, delayPassosLento, UnitMotors[0]);
-  // delay(1000);
-  // gira(HORARIO, 100, delayPassosLento, UnitMotors[0]);
-  // gira(HORARIO, 100, delayPassosLento, UnitMotors[1]);
+}
 
-  // delay(500);
-  // gira(0, 100, delayPassosLento, UnitMotors[1]);
+void testComponents(){
 
-  //Serial.println(getCurrentWeight());
+  Serial.print("Sensor módulo 1:");
+  Serial.println(measureDistanceUS(UnitSensors[0]));
+  Serial.print("Sensor módulo 2:");
+  Serial.println(measureDistanceUS(UnitSensors[1]));
+  Serial.print("Sensor Balança:");
+  Serial.println(measureDistanceUS(UnitSensors[2]));
+
+  Serial.println("Teste motor módulo 1");
+
+  gira(HORARIO, 100, delayPassosLentos, UnitMotors[0]);
+  gira(ANTIHORARIO, 100, delayPassosLentos, UnitMotors[0]);
+
+  Serial.println("Teste motor módulo 2");
+
+  gira(HORARIO, 100, delayPassosLentos, UnitMotors[1]);
+  gira(ANTIHORARIO, 100, delayPassosLentos, UnitMotors[1]);
+
+
+
+
+
 }
 
 void inicializationMode(){
@@ -76,10 +120,9 @@ void inicializationMode(){
         calibrateLoadCell();
       if(inByte == 'p')
         break;
-      
-      Serial.print(".");
 
     }
+    Serial.print(".");
     delay(500);
   }
 }
