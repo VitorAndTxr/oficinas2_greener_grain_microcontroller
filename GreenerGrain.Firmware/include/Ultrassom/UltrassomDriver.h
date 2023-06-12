@@ -4,7 +4,7 @@
 const int trigPinUS1 = 32;
 const int echoPinUS1 = 39;
 
-const int trigPinUS2 = 33;
+const int trigPinUS2 = 23;//33
 const int echoPinUS2 = 34;
 
 const int trigPinUS3 = 25;

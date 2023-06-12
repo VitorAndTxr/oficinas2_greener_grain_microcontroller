@@ -1,9 +1,9 @@
-#include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <string.h>
 
 //Your Domain name with URL path or IP address with path
-const char* serverName = "http://192.168.43.211:6006/api/v1/health";
+String serverName = "http://192.168.18.6:6006/api/v1";
 
 // the following variables are unsigned longs because the time, measured in
 // milliseconds, will quickly become a bigger number than can be stored in an int.
@@ -14,7 +14,7 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
 
 String apiResponse;
-String httpGETRequest(const char* serverName);
+String httpGETRequest(String serverName);
 
 
 void getAPIHealth() {
@@ -22,8 +22,8 @@ void getAPIHealth() {
   if ((millis() - lastTime) > timerDelay) {
     //Check WiFi connection status
     if(WiFi.status()== WL_CONNECTED){
-              
-      apiResponse = httpGETRequest(serverName);
+      
+      apiResponse = httpGETRequest(serverName+"/health");
 
       Serial.println("apiResponse:");
       Serial.println(apiResponse);
@@ -65,7 +65,7 @@ void getAPIHealth() {
   }
 }
 
-String httpGETRequest(const char* serverName) {
+String httpGETRequest(String serverName) {
   WiFiClient client;
   HTTPClient http;
     

@@ -17,7 +17,7 @@ enum SpinDirectionEnum {HORARIO, ANTIHORARIO};
 //Definicao motor
 
 const int delayPassosLentos = 3000;
-const int delayPassosRapidos = 2000;
+const int delayPassosRapidos = 2500;
 
 struct Motor{
   int Step;
