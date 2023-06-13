@@ -35,7 +35,7 @@ void HandleDispenseOrder(){
 
 
 
-    }while(((balanceDistance > 25) || (curretPeso<15)));
+    }while(((balanceDistance > 25) || (curretPeso<25)));
 
     Serial.println("Aguardando tara...");
 

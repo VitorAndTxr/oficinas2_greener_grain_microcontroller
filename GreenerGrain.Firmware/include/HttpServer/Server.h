@@ -10,7 +10,7 @@ void testMotor(int module);
 void initiateServer() { 
 
   server.on(
-    "/test-module",
+    "/requestGrain",
     HTTP_POST,
     [](AsyncWebServerRequest * request){},
     NULL,

@@ -20,10 +20,10 @@ void setup(){
 
   initiateWifi();
   initiateServer();
-  //setupMotor();
-  //initiateUltrassonicSensor();
-  //setupLoadCell();
-  //inicializationMode();
+  setupMotor();
+  initiateUltrassonicSensor();
+  setupLoadCell();
+  inicializationMode();
   CurrentState = IDLE;
 }
 
@@ -33,8 +33,7 @@ void loop() {
 
   sendUnityStatus();
 
-  delay(5000);
-  /*if(Order.module>-1)
+  if(Order.module>-1)
   {
     HandleDispenseOrder();
   }
@@ -48,7 +47,9 @@ void loop() {
     if(inByte == 'p')
       medirPeso();
 
-  }*/
+  }
+  delay(5000);
+
 }
 
 
@@ -240,25 +241,26 @@ void sendUnityStatus(){
 
   char texto[] = "\"misael\"";
   StaticJsonDocument<100> data;
+  data["status"] = CurrentState;
   data["id"] = "F37D7922-8DA4-4406-B904-8CAD037B58F1";
   data["ip"] = WiFi.localIP().toString();
   	
   char buffer[100];
   serializeJson(data, buffer);
 
-  Serial.println(buffer);
+  // Serial.println(buffer);
 
   int httpResponseCode = http.POST(buffer);
 
   String payload = "{}";
 
   if (httpResponseCode>0) {
-     Serial.print("HTTP Response code: ");
-     Serial.println(httpResponseCode);
+    //  Serial.print("HTTP Response code: ");
+    //  Serial.println(httpResponseCode);
     payload = http.getString();
-     Serial.println("payload");
+    //  Serial.println("payload");
 
-     Serial.println(payload);
+    //  Serial.println(payload);
   }
   else {
     Serial.print("Error code: ");
@@ -267,7 +269,7 @@ void sendUnityStatus(){
   // Free resources
   http.end();
 
-  Serial.println("passa do end");
+  //Serial.println("passa do end");
 
   //return "payload";
 
